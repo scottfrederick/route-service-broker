@@ -1,0 +1,19 @@
+spring:
+  cloud:
+    openservicebroker:
+      catalog:
+        services:
+        - id: d897c845-e15e-467e-9c34-71632e8807e1
+          name: route-logger
+          description: A simple route logging service
+          bindable: true
+          requires: ["route_forwarding"]
+          tags:
+          - route-service
+          - logging
+          plans:
+          - id: 3944a61c-ed68-45c5-b649-a99d1f301c69
+            name: standard
+            description: A simple plan
+            free: true
+            bindable: true
