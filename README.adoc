@@ -2,11 +2,14 @@
 
 This project implements a sample service broker that adheres to the https://www.openservicebrokerapi.org/[Open Service Broker API] using the https://cloud.spring.io/spring-cloud-open-service-broker/[Spring Cloud Open Service Broker] framework. It can be deployed to Cloud Foundry and registered as a service broker.
 
+This sample was inspired by a https://medium.com/@fitzoh/creating-a-cloud-foundry-route-service-with-spring-cloud-gateway-2dcabf04540e[blog post] by https://github.com/Fitzoh[Andrew Fitzgerald].
+
 == Compatibility
 
 * https://projects.spring.io/spring-framework/[Spring Framework] 5.x
 * https://projects.spring.io/spring-boot/[Spring Boot] 2.x
 * https://cloud.spring.io/spring-cloud-open-service-broker/[Spring Cloud Open Service Broker] 2.0.0.BUILD-SNAPSHOT
+* https://cloud.spring.io/spring-cloud-gateway/[Spring Cloud Gateway] 2.0.0.RC1
 
 == Getting Started
 
