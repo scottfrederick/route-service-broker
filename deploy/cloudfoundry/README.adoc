@@ -179,7 +179,7 @@ OK
 Send any request to the application that the service instance is bound to:
 ----
 $ curl https://appname.apps.example.com
----
+----
 
 View the logs of the service broker to verify that it intercepted the request to the application and logged it:
 
