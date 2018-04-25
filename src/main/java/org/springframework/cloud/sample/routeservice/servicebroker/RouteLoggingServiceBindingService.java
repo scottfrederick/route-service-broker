@@ -23,16 +23,25 @@ import org.springframework.cloud.servicebroker.model.binding.CreateServiceInstan
 import org.springframework.cloud.servicebroker.model.binding.DeleteServiceInstanceBindingRequest;
 import org.springframework.cloud.servicebroker.service.ServiceInstanceBindingService;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.DefaultUriBuilderFactory;
+
+import java.net.URI;
 
 @Service
 public class RouteLoggingServiceBindingService implements ServiceInstanceBindingService {
-	@Value("${vcap.application.uris[0]:https://localhost:8080}")
+	@Value("${vcap.application.uris[0]:localhost}")
 	private String appRoute;
 
 	@Override
 	public CreateServiceInstanceBindingResponse createServiceInstanceBinding(CreateServiceInstanceBindingRequest request) {
+		URI uri = new DefaultUriBuilderFactory().builder()
+				.scheme("https")
+				.host(appRoute)
+				.pathSegment("instanceId", request.getServiceInstanceId())
+				.build();
+
 		return CreateServiceInstanceRouteBindingResponse.builder()
-				.routeServiceUrl("https://" + appRoute)
+				.routeServiceUrl(uri.toString())
 				.build();
 	}
 

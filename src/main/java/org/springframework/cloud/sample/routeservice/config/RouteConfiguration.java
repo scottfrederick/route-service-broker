@@ -54,14 +54,16 @@ public class RouteConfiguration {
 	@Bean
 	public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
 		return builder.routes()
-				.route(r ->
-						r.predicate(cloudFoundryPredicate())
-								.filters(f -> {
-									f.filter(loggingFilter());
-									f.filter(forwardingFilter());
-									return f;
-								})
-								.uri("https://cloud.spring.io"))
+				.route(r -> r
+						.path("/instanceId/{instanceId}")
+						.and()
+						.predicate(cloudFoundryPredicate())
+						.filters(f -> {
+							f.filter(loggingFilter());
+							f.filter(forwardingFilter());
+							return f;
+						})
+						.uri("https://cloud.spring.io"))
 				.build();
 	}
 }
