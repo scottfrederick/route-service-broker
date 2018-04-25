@@ -16,33 +16,49 @@
 
 package org.springframework.cloud.sample.routeservice.config;
 
+import org.springframework.cloud.gateway.filter.GatewayFilter;
+import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory.NameConfig;
+import org.springframework.cloud.gateway.filter.factory.RequestHeaderToRequestUriGatewayFilterFactory;
+import org.springframework.cloud.gateway.handler.predicate.CloudFoundryRouteServiceRoutePredicateFactory;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
-import org.springframework.cloud.sample.routeservice.RouteLoggingHeaderUtil;
-import org.springframework.cloud.sample.routeservice.filter.ForwardingGatewayFilter;
-import org.springframework.cloud.sample.routeservice.filter.LoggingGatewayFilter;
+import org.springframework.cloud.sample.routeservice.filter.LoggingGatewayFilterFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.server.ServerWebExchange;
 
-import static org.springframework.cloud.gateway.filter.RouteToRequestUrlFilter.ROUTE_TO_URL_FILTER_ORDER;
+import java.util.function.Predicate;
+
+import static org.springframework.cloud.gateway.handler.predicate.CloudFoundryRouteServiceRoutePredicateFactory.X_CF_FORWARDED_URL;
 
 @Configuration
 public class RouteConfiguration {
 
 	@Bean
-	public RouteLocator customRouteLocator(RouteLocatorBuilder builder,
-										   LoggingGatewayFilter loggingFilter,
-										   ForwardingGatewayFilter forwardingFilter) {
+	public Predicate<ServerWebExchange> cloudFoundryPredicate() {
+		return new CloudFoundryRouteServiceRoutePredicateFactory().apply("");
+	}
+
+	@Bean
+	public GatewayFilter forwardingFilter() {
+		NameConfig config = new NameConfig();
+		config.setName(X_CF_FORWARDED_URL);
+		return new RequestHeaderToRequestUriGatewayFilterFactory().apply(config);
+	}
+
+	@Bean
+	public GatewayFilter loggingFilter() {
+		return new LoggingGatewayFilterFactory().apply("");
+	}
+
+	@Bean
+	public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
 		return builder.routes()
 				.route(r ->
-						r.header(RouteLoggingHeaderUtil.FORWARDED_URL, ".*")
-								.and()
-								.header(RouteLoggingHeaderUtil.PROXY_METADATA, ".*")
-								.and()
-								.header(RouteLoggingHeaderUtil.PROXY_SIGNATURE, ".*")
+						r.predicate(cloudFoundryPredicate())
 								.filters(f -> {
-									f.filter(loggingFilter);
-									f.filter(forwardingFilter, ROUTE_TO_URL_FILTER_ORDER + 1);
+									f.filter(loggingFilter());
+									f.filter(forwardingFilter());
 									return f;
 								})
 								.uri("https://cloud.spring.io"))
