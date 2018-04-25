@@ -4,7 +4,7 @@ spring:
       catalog:
         services:
         - id: d897c845-e15e-467e-9c34-71632e8807e1
-          name: route-logger
+          name: route-service
           description: A simple route logging service
           bindable: true
           requires: ["route_forwarding"]
