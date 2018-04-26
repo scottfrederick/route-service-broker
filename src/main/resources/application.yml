@@ -17,3 +17,9 @@ spring:
             description: A simple plan
             free: true
             bindable: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

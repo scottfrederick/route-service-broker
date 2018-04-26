@@ -16,13 +16,16 @@
 
 package org.springframework.cloud.sample.routeservice.config;
 
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.cloud.gateway.config.GatewayAutoConfiguration;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
-import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory.NameConfig;
-import org.springframework.cloud.gateway.filter.factory.RequestHeaderToRequestUriGatewayFilterFactory;
+import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
+import org.springframework.cloud.gateway.filter.ratelimit.RedisRateLimiter;
 import org.springframework.cloud.gateway.handler.predicate.CloudFoundryRouteServiceRoutePredicateFactory;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.cloud.sample.routeservice.filter.LoggingGatewayFilterFactory;
+import org.springframework.cloud.sample.routeservice.filter.SessionIdKeyResolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.server.ServerWebExchange;
@@ -32,23 +35,27 @@ import java.util.function.Predicate;
 import static org.springframework.cloud.gateway.handler.predicate.CloudFoundryRouteServiceRoutePredicateFactory.X_CF_FORWARDED_URL;
 
 @Configuration
+@AutoConfigureBefore(GatewayAutoConfiguration.class)
 public class RouteConfiguration {
 
 	@Bean
 	public Predicate<ServerWebExchange> cloudFoundryPredicate() {
-		return new CloudFoundryRouteServiceRoutePredicateFactory().apply("");
-	}
-
-	@Bean
-	public GatewayFilter forwardingFilter() {
-		NameConfig config = new NameConfig();
-		config.setName(X_CF_FORWARDED_URL);
-		return new RequestHeaderToRequestUriGatewayFilterFactory().apply(config);
+		return new CloudFoundryRouteServiceRoutePredicateFactory().apply(config -> {});
 	}
 
 	@Bean
 	public GatewayFilter loggingFilter() {
-		return new LoggingGatewayFilterFactory().apply("");
+		return new LoggingGatewayFilterFactory().apply(config -> {});
+	}
+
+	@Bean
+	public RedisRateLimiter redisRateLimiter() {
+		return new RedisRateLimiter(1, 0);
+	}
+
+	@Bean
+	public KeyResolver keyResolver() {
+		return new SessionIdKeyResolver();
 	}
 
 	@Bean
@@ -58,9 +65,13 @@ public class RouteConfiguration {
 						.path("/instanceId/{instanceId}")
 						.and()
 						.predicate(cloudFoundryPredicate())
-						.filters(f -> {
-							f.filter(loggingFilter());
-							f.filter(forwardingFilter());
+						.filters(f -> { f
+							.filter(loggingFilter())
+							.requestRateLimiter(config -> config
+									.setRateLimiter(redisRateLimiter())
+									.setKeyResolver(keyResolver())
+							)
+							.requestHeaderToRequestUri(X_CF_FORWARDED_URL);
 							return f;
 						})
 						.uri("https://cloud.spring.io"))

@@ -33,7 +33,7 @@ import static org.springframework.cloud.gateway.handler.predicate.CloudFoundryRo
 import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.URI_TEMPLATE_VARIABLES_ATTRIBUTE;
 
 @Component
-public class LoggingGatewayFilterFactory extends AbstractGatewayFilterFactory {
+public class LoggingGatewayFilterFactory extends AbstractGatewayFilterFactory<Object> {
 	private final Logger log = LoggerFactory.getLogger(LoggingGatewayFilterFactory.class);
 
 	@Override
