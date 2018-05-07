@@ -24,7 +24,9 @@ import reactor.core.publisher.Mono;
 public class SessionIdKeyResolver implements KeyResolver {
 	@Override
 	public Mono<String> resolve(ServerWebExchange exchange) {
-		return exchange.getSession().map(WebSession::getId)
-				.switchIfEmpty(Mono.empty());
+		return Mono.just("unknown");
+//		return exchange.getSession()
+//				.map(WebSession::getId)
+//				.switchIfEmpty(Mono.just("unknown"));
 	}
 }

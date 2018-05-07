@@ -39,23 +39,23 @@ import static org.springframework.cloud.gateway.handler.predicate.CloudFoundryRo
 public class RouteConfiguration {
 
 	@Bean
+	public KeyResolver keyResolver() {
+		return new SessionIdKeyResolver();
+	}
+
+	@Bean
 	public Predicate<ServerWebExchange> cloudFoundryPredicate() {
 		return new CloudFoundryRouteServiceRoutePredicateFactory().apply(config -> {});
 	}
 
 	@Bean
-	public GatewayFilter loggingFilter() {
+	public GatewayFilter logger() {
 		return new LoggingGatewayFilterFactory().apply(config -> {});
 	}
 
 	@Bean
 	public RedisRateLimiter redisRateLimiter() {
-		return new RedisRateLimiter(1, 0);
-	}
-
-	@Bean
-	public KeyResolver keyResolver() {
-		return new SessionIdKeyResolver();
+		return new RedisRateLimiter(5, 5);
 	}
 
 	@Bean
@@ -66,7 +66,7 @@ public class RouteConfiguration {
 						.and()
 						.predicate(cloudFoundryPredicate())
 						.filters(f -> { f
-							.filter(loggingFilter())
+							.filter(logger())
 							.requestRateLimiter(config -> config
 									.setRateLimiter(redisRateLimiter())
 									.setKeyResolver(keyResolver())

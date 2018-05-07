@@ -27,6 +27,7 @@ import org.springframework.web.util.pattern.PathPattern.PathMatchInfo;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Map;
 
 import static org.springframework.cloud.gateway.handler.predicate.CloudFoundryRouteServiceRoutePredicateFactory.X_CF_FORWARDED_URL;
@@ -73,11 +74,18 @@ public class LoggingGatewayFilterFactory extends AbstractGatewayFilterFactory<Ob
 	}
 
 	private URI getForwardedUrl(ServerHttpRequest request) {
-		String forwardedUrl = request.getHeaders().get(X_CF_FORWARDED_URL).get(0);
+		List<String> headers = request.getHeaders().get(X_CF_FORWARDED_URL);
+		if (headers == null || headers.isEmpty()) {
+			log.warn("No " + X_CF_FORWARDED_URL + " header in request");
+			return null;
+		}
+
+		String forwardedUrl = headers.get(0);
 		try {
 			return new URI(forwardedUrl);
 		} catch (URISyntaxException e) {
-			throw new IllegalArgumentException("Invalid value for " + X_CF_FORWARDED_URL + " header: " + forwardedUrl);
+			log.warn("Invalid value for " + X_CF_FORWARDED_URL + " header: " + forwardedUrl);
+			return null;
 		}
 	}
 }
