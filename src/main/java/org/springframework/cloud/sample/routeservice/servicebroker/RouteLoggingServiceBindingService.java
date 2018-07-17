@@ -24,6 +24,7 @@ import org.springframework.cloud.servicebroker.model.binding.DeleteServiceInstan
 import org.springframework.cloud.servicebroker.service.ServiceInstanceBindingService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
+import reactor.core.publisher.Mono;
 
 import java.net.URI;
 
@@ -33,19 +34,20 @@ public class RouteLoggingServiceBindingService implements ServiceInstanceBinding
 	private String appRoute;
 
 	@Override
-	public CreateServiceInstanceBindingResponse createServiceInstanceBinding(CreateServiceInstanceBindingRequest request) {
+	public Mono<CreateServiceInstanceBindingResponse> createServiceInstanceBinding(CreateServiceInstanceBindingRequest request) {
 		URI uri = new DefaultUriBuilderFactory().builder()
 				.scheme("https")
 				.host(appRoute)
 				.pathSegment("instanceId", request.getServiceInstanceId())
 				.build();
 
-		return CreateServiceInstanceRouteBindingResponse.builder()
+		return Mono.just(CreateServiceInstanceRouteBindingResponse.builder()
 				.routeServiceUrl(uri.toString())
-				.build();
+				.build());
 	}
 
 	@Override
-	public void deleteServiceInstanceBinding(DeleteServiceInstanceBindingRequest request) {
+	public Mono<Void> deleteServiceInstanceBinding(DeleteServiceInstanceBindingRequest request) {
+		return Mono.empty();
 	}
 }

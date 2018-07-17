@@ -21,11 +21,11 @@ sourceCompatibility = 1.8
 
 repositories {
 	mavenCentral()
-	maven { url "https://repo.spring.io/milestone" }
+	maven { url "https://repo.spring.io/snapshot" }
 }
 
 ext {
-	springCloudVersion = 'Finchley.RC1'
+	springCloudVersion = 'Finchley.RELEASE'
 }
 
 dependencyManagement {
@@ -40,7 +40,7 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-security')
 
 	compile('org.springframework.cloud:spring-cloud-starter-gateway')
-	compile('org.springframework.cloud:spring-cloud-starter-open-service-broker-webflux:2.0.0.RC1')
+	compile('org.springframework.cloud:spring-cloud-starter-open-service-broker:3.0.0.BUILD-SNAPSHOT')
 
 	compile('org.springframework.boot:spring-boot-starter-cloud-connectors')
 	compile('org.springframework.boot:spring-boot-starter-data-redis-reactive')

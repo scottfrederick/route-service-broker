@@ -22,19 +22,20 @@ import org.springframework.cloud.servicebroker.model.instance.DeleteServiceInsta
 import org.springframework.cloud.servicebroker.model.instance.DeleteServiceInstanceResponse;
 import org.springframework.cloud.servicebroker.service.ServiceInstanceService;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 @Service
 public class RouteLoggingServiceInstanceService implements ServiceInstanceService {
 	@Override
-	public CreateServiceInstanceResponse createServiceInstance(CreateServiceInstanceRequest request) {
-		return CreateServiceInstanceResponse.builder()
+	public Mono<CreateServiceInstanceResponse> createServiceInstance(CreateServiceInstanceRequest request) {
+		return Mono.just(CreateServiceInstanceResponse.builder()
 				.instanceExisted(false)
-				.build();
+				.build());
 	}
 
 	@Override
-	public DeleteServiceInstanceResponse deleteServiceInstance(DeleteServiceInstanceRequest request) {
-		return DeleteServiceInstanceResponse.builder()
-				.build();
+	public Mono<DeleteServiceInstanceResponse> deleteServiceInstance(DeleteServiceInstanceRequest request) {
+		return Mono.just(DeleteServiceInstanceResponse.builder()
+				.build());
 	}
 }
